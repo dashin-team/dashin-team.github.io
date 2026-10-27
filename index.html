@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="description" content="險種快譯通｜用日常需求找保險教學與試算工具" />
+  <title>險種快譯通</title>
+  <style>
+    :root {
+      --navy: #003366;
+      --navy-deep: #001f3f;
+      --gold: #c9a227;
+      --gold-soft: #f8f1d8;
+      --emerald: #0a9b6a;
+      --emerald-soft: #e7f7f0;
+      --bg: #f4f6fa;
+      --card: #ffffff;
+      --text: #1a2332;
+      --muted: #4a5568;
+      --border: #dde3ec;
+      --radius: 16px;
+      --shadow: 0 4px 16px rgba(0, 31, 63, 0.08);
+      --shadow-hover: 0 10px 28px rgba(0, 31, 63, 0.14);
+      --tap: 52px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei",
+                   "Heiti TC", "Source Han Sans TC", sans-serif;
+      font-size: 18px;
+      line-height: 1.6;
+      color: var(--text);
+      background: var(--bg);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .wrap {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      padding: 0 16px 64px;
+    }
+
+    /* Header */
+    .hero {
+      background: linear-gradient(135deg, var(--navy-deep), var(--navy) 60%, #0a4a7a);
+      color: #fff;
+      padding: 32px 16px 28px;
+      border-bottom: 4px solid var(--gold);
+    }
+
+    .hero-inner { width: min(1120px, 100%); margin: 0 auto; }
+
+    .hero-kicker {
+      font-size: 1rem;
+      letter-spacing: 0.06em;
+      color: rgba(255,255,255,0.85);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hero-kicker::before {
+      content: "";
+      width: 10px; height: 10px; border-radius: 50%;
+      background: #1ec98a;
+      flex-shrink: 0;
+    }
+
+    .hero h1 {
+      font-size: clamp(1.9rem, 5.5vw, 2.5rem);
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      line-height: 1.25;
+    }
+
+    .hero-sub {
+      margin-top: 10px;
+      font-size: 1.05rem;
+      color: rgba(255,255,255,0.9);
+      max-width: 28em;
+    }
+
+    /* Search */
+    .search-panel {
+      margin-top: -22px;
+      position: relative;
+      z-index: 5;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 8px 6px 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .search-box:focus-within {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 4px rgba(201, 162, 39, 0.2), var(--shadow);
+    }
+
+    .search-icon {
+      flex-shrink: 0;
+      width: 24px; height: 24px;
+      color: var(--navy);
+    }
+
+    .search-box input {
+      flex: 1;
+      border: 0;
+      outline: none;
+      font: inherit;
+      font-size: 1.05rem;
+      min-height: var(--tap);
+      background: transparent;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .search-box input::placeholder { color: #8a94a6; }
+
+    .search-clear {
+      flex-shrink: 0;
+      min-width: var(--tap);
+      min-height: var(--tap);
+      border: 0;
+      border-radius: 999px;
+      background: var(--navy-soft, #e8eef6);
+      background: #e8eef6;
+      color: var(--navy);
+      font: inherit;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0 16px;
+    }
+
+    .search-clear:hover { background: #d9e3f0; }
+    .search-clear[hidden] { display: none; }
+
+    .search-hint {
+      margin-top: 10px;
+      font-size: 0.95rem;
+      color: var(--muted);
+      min-height: 1.5em;
+    }
+
+    .search-hint strong { color: var(--navy); }
+
+    /* Category jump */
+    .jump {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 22px 0 8px;
+    }
+
+    .jump a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 44px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      color: var(--navy);
+      font-size: 1rem;
+      font-weight: 700;
+      box-shadow: 0 1px 4px rgba(0,31,63,0.05);
+    }
+
+    .jump a:hover,
+    .jump a:focus-visible {
+      border-color: var(--gold);
+      outline: none;
+    }
+
+    /* Sections */
+    section.cat {
+      padding-top: 28px;
+    }
+
+    section.cat[hidden] { display: none; }
+
+    .cat-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 6px;
+      padding-bottom: 10px;
+      border-bottom: 3px solid #e3eaf3;
+    }
+
+    .cat-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: var(--emerald-soft);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      font-size: 1.45rem;
+    }
+
+    .cat-head h2 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--navy);
+    }
+
+    .cat-desc {
+      color: var(--muted);
+      font-size: 1rem;
+      margin: 10px 0 16px;
+    }
+
+    /* Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    @media (min-width: 640px) {
+      .grid { grid-template-columns: 1fr 1fr; }
+      .hero { padding: 40px 24px 36px; }
+    }
+
+    @media (min-width: 960px) {
+      .grid { grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    }
+
+    /* Cards */
+    .card {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 20px 18px 18px;
+      border-radius: var(--radius);
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      box-shadow: var(--shadow);
+      min-height: 180px;
+      transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+    }
+
+    .card[hidden] { display: none; }
+
+    .card:hover,
+    .card:focus-within {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-hover);
+      border-color: rgba(201, 162, 39, 0.65);
+    }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .card-emoji {
+      width: 48px; height: 48px;
+      border-radius: 14px;
+      background: #eef3f9;
+      display: grid;
+      place-items: center;
+      font-size: 1.55rem;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .card h3 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--navy-deep);
+      line-height: 1.35;
+      padding-top: 4px;
+    }
+
+    .card p {
+      font-size: 1.02rem;
+      color: var(--muted);
+      flex: 1;
+    }
+
+    .card .cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      align-self: stretch;
+      min-height: var(--tap);
+      padding: 12px 18px;
+      border-radius: 999px;
+      background: var(--navy);
+      color: #fff;
+      font-size: 1.08rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      margin-top: 4px;
+    }
+
+    .card .cta svg {
+      width: 20px; height: 20px;
+      stroke: var(--gold);
+      fill: none;
+      stroke-width: 2.6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .card:hover .cta { background: var(--navy-deep); }
+
+    .empty {
+      display: none;
+      text-align: center;
+      padding: 40px 16px;
+      color: var(--muted);
+      font-size: 1.1rem;
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1.5px dashed var(--border);
+      margin-top: 20px;
+    }
+
+    .empty.show { display: block; }
+
+    footer {
+      margin-top: 48px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    footer strong { color: var(--navy); }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <p class="hero-kicker">保險，用生活場景來找就好</p>
+      <h1>險種快譯通</h1>
+      <p class="hero-sub">不管您想了解住院、癌症、意外、長照、車險或旅平險，都可以從這裡進去看說明、做試算。</p>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="search-panel">
+      <label class="search-box" for="q">
+        <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2.4"/>
+          <path d="M20 20l-3.5-3.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+        </svg>
+        <input id="q" type="search" enterkeyhint="search" autocomplete="off"
+               placeholder="搜尋：例如 癌症、車禍、長照、報價…"
+               aria-label="搜尋保險主題" />
+        <button type="button" class="search-clear" id="clearBtn" hidden aria-label="清除搜尋">清除</button>
+      </label>
+      <p class="search-hint" id="hint" aria-live="polite">共 15 個主題，可直接點下面分類，或用關鍵字搜尋。</p>
+    </div>
+
+    <nav class="jump" id="jump" aria-label="依生活需求分類"></nav>
+
+    <div id="cats"></div>
+    <p class="empty" id="empty">找不到符合的主題，請換個關鍵字試試（例如：住院、癌症、車禍、長照）。</p>
+
+    <footer>
+      <p><strong>險種快譯通</strong> · 用日常需求找保險說明與工具</p>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      var cats = [
+        {
+          id: "hospital",
+          name: "生病住院",
+          emoji: "🏥",
+          desc: "住院、開刀、實支實付，先搞懂怎麼賠。",
+          sites: [
+            {
+              name: "實支實付與手術險",
+              emoji: "🛏️",
+              blurb: "住院開刀時，實支實付與手術險大概怎麼賠。",
+              url: "https://dashin-team.github.io/surgery-insurance-guide/",
+              keys: "生病 住院 開刀 手術 實支實付 處置 門診手術 surgery"
+            },
+            {
+              name: "人類風險地圖",
+              emoji: "🗺️",
+              blurb: "用簡單地圖，看懂人生各階段常見的疾病風險。",
+              url: "https://dashin-team.github.io/human-risk-map/",
+              keys: "生病 疾病 風險 地圖 健康 人生階段 human"
+            }
+          ]
+        },
+        {
+          id: "cancer",
+          name: "癌症重病",
+          emoji: "🎗️",
+          desc: "癌症與重大傷病：風險、費用與保費試算。",
+          sites: [
+            {
+              name: "癌症風險地圖",
+              emoji: "📍",
+              blurb: "如果得了癌症，大概要準備多少錢。",
+              url: "https://dashin-team.github.io/cancer-risk-map/",
+              keys: "癌症 重病 費用 治療 風險地圖 cancer"
+            },
+            {
+              name: "我們與癌的距離",
+              emoji: "📝",
+              blurb: "用 10 題小測驗，看看生活裡可調整的風險。",
+              url: "https://dashin-team.github.io/cancer-risk-quiz/",
+              keys: "癌症 測驗 生活 風險 習慣 quiz"
+            },
+            {
+              name: "男癌／女癌試算",
+              emoji: "🧮",
+              blurb: "男性、女性癌症險保費，輸入資料就能試算。",
+              url: "https://dashin-team.github.io/cia-cib-cancer/",
+              keys: "癌症 試算 保費 男癌 女癌 CIA CIB"
+            },
+            {
+              name: "認識重大傷病",
+              emoji: "💜",
+              blurb: "重大傷病是什麼？保障可以怎麼規劃。",
+              url: "https://dashin-team.github.io/critical-illness/",
+              keys: "重大傷病 重病 重症 保障 規劃 critical"
+            }
+          ]
+        },
+        {
+          id: "accident",
+          name: "意外受傷",
+          emoji: "🩹",
+          desc: "摔傷、骨折、意外事故的保障與報價。",
+          sites: [
+            {
+              name: "意外險說明",
+              emoji: "📖",
+              blurb: "一次看懂意外險理賠項目與失能等級。",
+              url: "https://dashin-team.github.io/accident-insurance-guide/",
+              keys: "意外 受傷 骨折 理賠 失能 職業等級 教學"
+            },
+            {
+              name: "意外險／骨折險報價",
+              emoji: "💰",
+              blurb: "想知道意外險大概多少錢，可以在這裡試算。",
+              url: "https://dashin-team.github.io/accident-insurance/",
+              keys: "意外 骨折 報價 試算 保費 accident"
+            }
+          ]
+        },
+        {
+          id: "ltc",
+          name: "長照失能",
+          emoji: "🤝",
+          desc: "失能、長照、失智相關保障怎麼分。",
+          sites: [
+            {
+              name: "失能／長照／失智險比較",
+              emoji: "⚖️",
+              blurb: "這三種險差在哪？用對照一次看懂。",
+              url: "https://dashin-team.github.io/ltc-compare-v2/",
+              keys: "長照 失能 失智 照顧 比較 看護 ltc"
+            }
+          ]
+        },
+        {
+          id: "car",
+          name: "開車出門",
+          emoji: "🚗",
+          desc: "汽機車保險報價、保障檢查與車禍理賠。",
+          sites: [
+            {
+              name: "汽機車險即時報價",
+              emoji: "🧾",
+              blurb: "汽機車保險，現場就能試算報價。",
+              url: "https://dashin-team.github.io/car-quote/",
+              keys: "汽車 機車 車險 報價 試算 開車"
+            },
+            {
+              name: "車險保障健檢",
+              emoji: "✅",
+              blurb: "一步步檢查現在的車險保障夠不夠。",
+              url: "https://dashin-team.github.io/fubon-car-insurance-guide/",
+              keys: "車險 健檢 保障 教學 開車 汽車"
+            },
+            {
+              name: "車禍理賠流程",
+              emoji: "📋",
+              blurb: "發生車禍後，理賠流程怎麼走才安心。",
+              url: "https://dashin-team.github.io/nanen-car-claim-guide/",
+              keys: "車禍 事故 理賠 流程 開車 車險"
+            }
+          ]
+        },
+        {
+          id: "travel",
+          name: "旅遊出國",
+          emoji: "✈️",
+          desc: "出國、旅遊前的旅平險重點。",
+          sites: [
+            {
+              name: "旅平險大補給",
+              emoji: "🧳",
+              blurb: "出國旅遊前，旅平險要注意哪些事。",
+              url: "https://dashin-team.github.io/travel-insurance-guide/",
+              keys: "旅遊 出國 旅平險 旅行 海外 travel"
+            }
+          ]
+        },
+        {
+          id: "estate",
+          name: "退休傳承",
+          emoji: "🏡",
+          desc: "遺產稅、贈與稅與預留稅源。",
+          sites: [
+            {
+              name: "遺產稅・贈與稅規劃",
+              emoji: "📑",
+              blurb: "遺產稅、贈與稅怎麼算，怎麼預先規劃。",
+              url: "https://dashin-team.github.io/estate-tax-planner/",
+              keys: "退休 傳承 遺產 贈與 稅 規劃 試算 estate"
+            }
+          ]
+        },
+        {
+          id: "job",
+          name: "職業責任",
+          emoji: "👩‍🏫",
+          desc: "工作上可能遇到的責任風險。",
+          sites: [
+            {
+              name: "教師責任險",
+              emoji: "🏫",
+              blurb: "老師在學校可能遇到的責任風險與保障。",
+              url: "https://dashin-team.github.io/teacher-liability/",
+              keys: "教師 老師 責任險 校園 職業 教學"
+            }
+          ]
+        }
+      ];
+
+      var catsEl = document.getElementById("cats");
+      var jumpEl = document.getElementById("jump");
+      var hint = document.getElementById("hint");
+      var empty = document.getElementById("empty");
+      var q = document.getElementById("q");
+      var clearBtn = document.getElementById("clearBtn");
+
+      function arrowSvg() {
+        return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M13 5l7 7-7 7"/></svg>';
+      }
+
+      // Build DOM
+      cats.forEach(function (cat) {
+        var a = document.createElement("a");
+        a.href = "#" + cat.id;
+        a.textContent = cat.emoji + " " + cat.name;
+        jumpEl.appendChild(a);
+
+        var sec = document.createElement("section");
+        sec.className = "cat";
+        sec.id = cat.id;
+        sec.setAttribute("aria-labelledby", cat.id + "-title");
+
+        var head = document.createElement("div");
+        head.className = "cat-head";
+        head.innerHTML =
+          '<div class="cat-icon" aria-hidden="true">' + cat.emoji + "</div>" +
+          '<h2 id="' + cat.id + '-title">' + cat.name + "</h2>";
+        sec.appendChild(head);
+
+        var desc = document.createElement("p");
+        desc.className = "cat-desc";
+        desc.textContent = cat.desc;
+        sec.appendChild(desc);
+
+        var grid = document.createElement("div");
+        grid.className = "grid";
+
+        cat.sites.forEach(function (site) {
+          var card = document.createElement("a");
+          card.className = "card";
+          card.href = site.url;
+          card.target = "_blank";
+          card.rel = "noopener";
+          card.dataset.name = site.name;
+          card.dataset.keys = (site.name + " " + site.blurb + " " + site.keys + " " + cat.name).toLowerCase();
+
+          card.innerHTML =
+            '<div class="card-top">' +
+              '<div class="card-emoji" aria-hidden="true">' + site.emoji + "</div>" +
+              "<h3>" + site.name + "</h3>" +
+            "</div>" +
+            "<p>" + site.blurb + "</p>" +
+            '<span class="cta">進入 ' + arrowSvg() + "</span>";
+          grid.appendChild(card);
+        });
+
+        sec.appendChild(grid);
+        catsEl.appendChild(sec);
+      });
+
+      function filter() {
+        var term = (q.value || "").trim().toLowerCase();
+        clearBtn.hidden = !term;
+        var total = 0;
+        var shown = 0;
+
+        cats.forEach(function (cat) {
+          var sec = document.getElementById(cat.id);
+          var cards = sec.querySelectorAll(".card");
+          var catShown = 0;
+          cards.forEach(function (card) {
+            total++;
+            var ok = !term || card.dataset.keys.indexOf(term) !== -1;
+            card.hidden = !ok;
+            if (ok) { shown++; catShown++; }
+          });
+          sec.hidden = catShown === 0;
+        });
+
+        // jump chips
+        Array.prototype.forEach.call(jumpEl.children, function (chip) {
+          var id = chip.getAttribute("href").slice(1);
+          var sec = document.getElementById(id);
+          chip.style.display = sec.hidden ? "none" : "";
+        });
+
+        empty.classList.toggle("show", shown === 0);
+        if (!term) {
+          hint.innerHTML = "共 <strong>" + total + "</strong> 個主題，可直接點下面分類，或用關鍵字搜尋。";
+        } else if (shown === 0) {
+          hint.innerHTML = "搜尋「<strong>" + term.replace(/</g, "") + "</strong>」：沒有符合的主題。";
+        } else {
+          hint.innerHTML = "搜尋「<strong>" + term.replace(/</g, "") + "</strong>」：找到 <strong>" + shown + "</strong> 個主題。";
+        }
+      }
+
+      q.addEventListener("input", filter);
+      clearBtn.addEventListener("click", function () {
+        q.value = "";
+        q.focus();
+        filter();
+      });
+      filter();
+    })();
+  </script>
+</body>
+</html>
