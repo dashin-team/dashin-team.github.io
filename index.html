@@ -1,668 +1,424 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="description" content="險種快譯通｜用日常需求找保險教學與試算工具" />
-  <title>險種快譯通</title>
-  <style>
-    :root {
-      --navy: #003366;
-      --navy-deep: #001f3f;
-      --gold: #c9a227;
-      --gold-soft: #f8f1d8;
-      --emerald: #0a9b6a;
-      --emerald-soft: #e7f7f0;
-      --bg: #f4f6fa;
-      --card: #ffffff;
-      --text: #1a2332;
-      --muted: #4a5568;
-      --border: #dde3ec;
-      --radius: 16px;
-      --shadow: 0 4px 16px rgba(0, 31, 63, 0.08);
-      --shadow-hover: 0 10px 28px rgba(0, 31, 63, 0.14);
-      --tap: 52px;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      font-family: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei",
-                   "Heiti TC", "Source Han Sans TC", sans-serif;
-      font-size: 18px;
-      line-height: 1.6;
-      color: var(--text);
-      background: var(--bg);
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    a { color: inherit; text-decoration: none; }
-
-    .wrap {
-      width: min(1120px, 100%);
-      margin: 0 auto;
-      padding: 0 16px 64px;
-    }
-
-    /* Header */
-    .hero {
-      background: linear-gradient(135deg, var(--navy-deep), var(--navy) 60%, #0a4a7a);
-      color: #fff;
-      padding: 32px 16px 28px;
-      border-bottom: 4px solid var(--gold);
-    }
-
-    .hero-inner { width: min(1120px, 100%); margin: 0 auto; }
-
-    .hero-kicker {
-      font-size: 1rem;
-      letter-spacing: 0.06em;
-      color: rgba(255,255,255,0.85);
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .hero-kicker::before {
-      content: "";
-      width: 10px; height: 10px; border-radius: 50%;
-      background: #1ec98a;
-      flex-shrink: 0;
-    }
-
-    .hero h1 {
-      font-size: clamp(1.9rem, 5.5vw, 2.5rem);
-      font-weight: 900;
-      letter-spacing: 0.04em;
-      line-height: 1.25;
-    }
-
-    .hero-sub {
-      margin-top: 10px;
-      font-size: 1.05rem;
-      color: rgba(255,255,255,0.9);
-      max-width: 28em;
-    }
-
-    /* Search */
-    .search-panel {
-      margin-top: -22px;
-      position: relative;
-      z-index: 5;
-    }
-
-    .search-box {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background: var(--card);
-      border: 2px solid var(--border);
-      border-radius: 999px;
-      padding: 6px 8px 6px 18px;
-      box-shadow: var(--shadow);
-    }
-
-    .search-box:focus-within {
-      border-color: var(--gold);
-      box-shadow: 0 0 0 4px rgba(201, 162, 39, 0.2), var(--shadow);
-    }
-
-    .search-icon {
-      flex-shrink: 0;
-      width: 24px; height: 24px;
-      color: var(--navy);
-    }
-
-    .search-box input {
-      flex: 1;
-      border: 0;
-      outline: none;
-      font: inherit;
-      font-size: 1.05rem;
-      min-height: var(--tap);
-      background: transparent;
-      color: var(--text);
-      width: 100%;
-    }
-
-    .search-box input::placeholder { color: #8a94a6; }
-
-    .search-clear {
-      flex-shrink: 0;
-      min-width: var(--tap);
-      min-height: var(--tap);
-      border: 0;
-      border-radius: 999px;
-      background: var(--navy-soft, #e8eef6);
-      background: #e8eef6;
-      color: var(--navy);
-      font: inherit;
-      font-size: 0.95rem;
-      font-weight: 700;
-      cursor: pointer;
-      padding: 0 16px;
-    }
-
-    .search-clear:hover { background: #d9e3f0; }
-    .search-clear[hidden] { display: none; }
-
-    .search-hint {
-      margin-top: 10px;
-      font-size: 0.95rem;
-      color: var(--muted);
-      min-height: 1.5em;
-    }
-
-    .search-hint strong { color: var(--navy); }
-
-    /* Category jump */
-    .jump {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin: 22px 0 8px;
-    }
-
-    .jump a {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      min-height: 44px;
-      padding: 8px 16px;
-      border-radius: 999px;
-      background: var(--card);
-      border: 1.5px solid var(--border);
-      color: var(--navy);
-      font-size: 1rem;
-      font-weight: 700;
-      box-shadow: 0 1px 4px rgba(0,31,63,0.05);
-    }
-
-    .jump a:hover,
-    .jump a:focus-visible {
-      border-color: var(--gold);
-      outline: none;
-    }
-
-    /* Sections */
-    section.cat {
-      padding-top: 28px;
-    }
-
-    section.cat[hidden] { display: none; }
-
-    .cat-head {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 6px;
-      padding-bottom: 10px;
-      border-bottom: 3px solid #e3eaf3;
-    }
-
-    .cat-icon {
-      width: 44px; height: 44px;
-      border-radius: 12px;
-      background: var(--emerald-soft);
-      display: grid;
-      place-items: center;
-      flex-shrink: 0;
-      font-size: 1.45rem;
-    }
-
-    .cat-head h2 {
-      font-size: 1.35rem;
-      font-weight: 800;
-      color: var(--navy);
-    }
-
-    .cat-desc {
-      color: var(--muted);
-      font-size: 1rem;
-      margin: 10px 0 16px;
-    }
-
-    /* Grid */
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 14px;
-    }
-
-    @media (min-width: 640px) {
-      .grid { grid-template-columns: 1fr 1fr; }
-      .hero { padding: 40px 24px 36px; }
-    }
-
-    @media (min-width: 960px) {
-      .grid { grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-    }
-
-    /* Cards */
-    .card {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      padding: 20px 18px 18px;
-      border-radius: var(--radius);
-      background: var(--card);
-      border: 1.5px solid var(--border);
-      box-shadow: var(--shadow);
-      min-height: 180px;
-      transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
-    }
-
-    .card[hidden] { display: none; }
-
-    .card:hover,
-    .card:focus-within {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-hover);
-      border-color: rgba(201, 162, 39, 0.65);
-    }
-
-    .card-top {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-    }
-
-    .card-emoji {
-      width: 48px; height: 48px;
-      border-radius: 14px;
-      background: #eef3f9;
-      display: grid;
-      place-items: center;
-      font-size: 1.55rem;
-      flex-shrink: 0;
-      line-height: 1;
-    }
-
-    .card h3 {
-      font-size: 1.15rem;
-      font-weight: 800;
-      color: var(--navy-deep);
-      line-height: 1.35;
-      padding-top: 4px;
-    }
-
-    .card p {
-      font-size: 1.02rem;
-      color: var(--muted);
-      flex: 1;
-    }
-
-    .card .cta {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      align-self: stretch;
-      min-height: var(--tap);
-      padding: 12px 18px;
-      border-radius: 999px;
-      background: var(--navy);
-      color: #fff;
-      font-size: 1.08rem;
-      font-weight: 800;
-      letter-spacing: 0.04em;
-      margin-top: 4px;
-    }
-
-    .card .cta svg {
-      width: 20px; height: 20px;
-      stroke: var(--gold);
-      fill: none;
-      stroke-width: 2.6;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .card:hover .cta { background: var(--navy-deep); }
-
-    .empty {
-      display: none;
-      text-align: center;
-      padding: 40px 16px;
-      color: var(--muted);
-      font-size: 1.1rem;
-      background: var(--card);
-      border-radius: var(--radius);
-      border: 1.5px dashed var(--border);
-      margin-top: 20px;
-    }
-
-    .empty.show { display: block; }
-
-    footer {
-      margin-top: 48px;
-      padding-top: 20px;
-      border-top: 1px solid var(--border);
-      text-align: center;
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-
-    footer strong { color: var(--navy); }
-  </style>
-</head>
-<body>
-  <header class="hero">
-    <div class="hero-inner">
-      <p class="hero-kicker">保險，用生活場景來找就好</p>
-      <h1>險種快譯通</h1>
-      <p class="hero-sub">不管您想了解住院、癌症、意外、長照、車險或旅平險，都可以從這裡進去看說明、做試算。</p>
-    </div>
-  </header>
-
-  <div class="wrap">
-    <div class="search-panel">
-      <label class="search-box" for="q">
-        <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2.4"/>
-          <path d="M20 20l-3.5-3.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
-        </svg>
-        <input id="q" type="search" enterkeyhint="search" autocomplete="off"
-               placeholder="搜尋：例如 癌症、車禍、長照、報價…"
-               aria-label="搜尋保險主題" />
-        <button type="button" class="search-clear" id="clearBtn" hidden aria-label="清除搜尋">清除</button>
-      </label>
-      <p class="search-hint" id="hint" aria-live="polite">共 15 個主題，可直接點下面分類，或用關鍵字搜尋。</p>
-    </div>
-
-    <nav class="jump" id="jump" aria-label="依生活需求分類"></nav>
-
-    <div id="cats"></div>
-    <p class="empty" id="empty">找不到符合的主題，請換個關鍵字試試（例如：住院、癌症、車禍、長照）。</p>
-
-    <footer>
-      <p><strong>險種快譯通</strong> · 用日常需求找保險說明與工具</p>
-    </footer>
-  </div>
-
-  <script>
-    (function () {
-      var cats = [
-        {
-          id: "hospital",
-          name: "生病住院",
-          emoji: "🏥",
-          desc: "住院、開刀、實支實付，先搞懂怎麼賠。",
-          sites: [
-            {
-              name: "實支實付與手術險",
-              emoji: "🛏️",
-              blurb: "住院開刀時，實支實付與手術險大概怎麼賠。",
-              url: "https://dashin-team.github.io/surgery-insurance-guide/",
-              keys: "生病 住院 開刀 手術 實支實付 處置 門診手術 surgery"
-            },
-            {
-              name: "人類風險地圖",
-              emoji: "🗺️",
-              blurb: "用簡單地圖，看懂人生各階段常見的疾病風險。",
-              url: "https://dashin-team.github.io/human-risk-map/",
-              keys: "生病 疾病 風險 地圖 健康 人生階段 human"
-            }
-          ]
-        },
-        {
-          id: "cancer",
-          name: "癌症重病",
-          emoji: "🎗️",
-          desc: "癌症與重大傷病：風險、費用與保費試算。",
-          sites: [
-            {
-              name: "癌症風險地圖",
-              emoji: "📍",
-              blurb: "如果得了癌症，大概要準備多少錢。",
-              url: "https://dashin-team.github.io/cancer-risk-map/",
-              keys: "癌症 重病 費用 治療 風險地圖 cancer"
-            },
-            {
-              name: "我們與癌的距離",
-              emoji: "📝",
-              blurb: "用 10 題小測驗，看看生活裡可調整的風險。",
-              url: "https://dashin-team.github.io/cancer-risk-quiz/",
-              keys: "癌症 測驗 生活 風險 習慣 quiz"
-            },
-            {
-              name: "男癌／女癌試算",
-              emoji: "🧮",
-              blurb: "男性、女性癌症險保費，輸入資料就能試算。",
-              url: "https://dashin-team.github.io/cia-cib-cancer/",
-              keys: "癌症 試算 保費 男癌 女癌 CIA CIB"
-            },
-            {
-              name: "認識重大傷病",
-              emoji: "💜",
-              blurb: "重大傷病是什麼？保障可以怎麼規劃。",
-              url: "https://dashin-team.github.io/critical-illness/",
-              keys: "重大傷病 重病 重症 保障 規劃 critical"
-            }
-          ]
-        },
-        {
-          id: "accident",
-          name: "意外受傷",
-          emoji: "🩹",
-          desc: "摔傷、骨折、意外事故的保障與報價。",
-          sites: [
-            {
-              name: "意外險說明",
-              emoji: "📖",
-              blurb: "一次看懂意外險理賠項目與失能等級。",
-              url: "https://dashin-team.github.io/accident-insurance-guide/",
-              keys: "意外 受傷 骨折 理賠 失能 職業等級 教學"
-            },
-            {
-              name: "意外險／骨折險報價",
-              emoji: "💰",
-              blurb: "想知道意外險大概多少錢，可以在這裡試算。",
-              url: "https://dashin-team.github.io/accident-insurance/",
-              keys: "意外 骨折 報價 試算 保費 accident"
-            }
-          ]
-        },
-        {
-          id: "ltc",
-          name: "長照失能",
-          emoji: "🤝",
-          desc: "失能、長照、失智相關保障怎麼分。",
-          sites: [
-            {
-              name: "失能／長照／失智險比較",
-              emoji: "⚖️",
-              blurb: "這三種險差在哪？用對照一次看懂。",
-              url: "https://dashin-team.github.io/ltc-compare-v2/",
-              keys: "長照 失能 失智 照顧 比較 看護 ltc"
-            }
-          ]
-        },
-        {
-          id: "car",
-          name: "開車出門",
-          emoji: "🚗",
-          desc: "汽機車保險報價、保障檢查與車禍理賠。",
-          sites: [
-            {
-              name: "汽機車險即時報價",
-              emoji: "🧾",
-              blurb: "汽機車保險，現場就能試算報價。",
-              url: "https://dashin-team.github.io/car-quote/",
-              keys: "汽車 機車 車險 報價 試算 開車"
-            },
-            {
-              name: "車險保障健檢",
-              emoji: "✅",
-              blurb: "一步步檢查現在的車險保障夠不夠。",
-              url: "https://dashin-team.github.io/fubon-car-insurance-guide/",
-              keys: "車險 健檢 保障 教學 開車 汽車"
-            },
-            {
-              name: "車禍理賠流程",
-              emoji: "📋",
-              blurb: "發生車禍後，理賠流程怎麼走才安心。",
-              url: "https://dashin-team.github.io/nanen-car-claim-guide/",
-              keys: "車禍 事故 理賠 流程 開車 車險"
-            }
-          ]
-        },
-        {
-          id: "travel",
-          name: "旅遊出國",
-          emoji: "✈️",
-          desc: "出國、旅遊前的旅平險重點。",
-          sites: [
-            {
-              name: "旅平險大補給",
-              emoji: "🧳",
-              blurb: "出國旅遊前，旅平險要注意哪些事。",
-              url: "https://dashin-team.github.io/travel-insurance-guide/",
-              keys: "旅遊 出國 旅平險 旅行 海外 travel"
-            }
-          ]
-        },
-        {
-          id: "estate",
-          name: "退休傳承",
-          emoji: "🏡",
-          desc: "遺產稅、贈與稅與預留稅源。",
-          sites: [
-            {
-              name: "遺產稅・贈與稅規劃",
-              emoji: "📑",
-              blurb: "遺產稅、贈與稅怎麼算，怎麼預先規劃。",
-              url: "https://dashin-team.github.io/estate-tax-planner/",
-              keys: "退休 傳承 遺產 贈與 稅 規劃 試算 estate"
-            }
-          ]
-        },
-        {
-          id: "job",
-          name: "職業責任",
-          emoji: "👩‍🏫",
-          desc: "工作上可能遇到的責任風險。",
-          sites: [
-            {
-              name: "教師責任險",
-              emoji: "🏫",
-              blurb: "老師在學校可能遇到的責任風險與保障。",
-              url: "https://dashin-team.github.io/teacher-liability/",
-              keys: "教師 老師 責任險 校園 職業 教學"
-            }
-          ]
-        }
-      ];
-
-      var catsEl = document.getElementById("cats");
-      var jumpEl = document.getElementById("jump");
-      var hint = document.getElementById("hint");
-      var empty = document.getElementById("empty");
-      var q = document.getElementById("q");
-      var clearBtn = document.getElementById("clearBtn");
-
-      function arrowSvg() {
-        return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M13 5l7 7-7 7"/></svg>';
-      }
-
-      // Build DOM
-      cats.forEach(function (cat) {
-        var a = document.createElement("a");
-        a.href = "#" + cat.id;
-        a.textContent = cat.emoji + " " + cat.name;
-        jumpEl.appendChild(a);
-
-        var sec = document.createElement("section");
-        sec.className = "cat";
-        sec.id = cat.id;
-        sec.setAttribute("aria-labelledby", cat.id + "-title");
-
-        var head = document.createElement("div");
-        head.className = "cat-head";
-        head.innerHTML =
-          '<div class="cat-icon" aria-hidden="true">' + cat.emoji + "</div>" +
-          '<h2 id="' + cat.id + '-title">' + cat.name + "</h2>";
-        sec.appendChild(head);
-
-        var desc = document.createElement("p");
-        desc.className = "cat-desc";
-        desc.textContent = cat.desc;
-        sec.appendChild(desc);
-
-        var grid = document.createElement("div");
-        grid.className = "grid";
-
-        cat.sites.forEach(function (site) {
-          var card = document.createElement("a");
-          card.className = "card";
-          card.href = site.url;
-          card.target = "_blank";
-          card.rel = "noopener";
-          card.dataset.name = site.name;
-          card.dataset.keys = (site.name + " " + site.blurb + " " + site.keys + " " + cat.name).toLowerCase();
-
-          card.innerHTML =
-            '<div class="card-top">' +
-              '<div class="card-emoji" aria-hidden="true">' + site.emoji + "</div>" +
-              "<h3>" + site.name + "</h3>" +
-            "</div>" +
-            "<p>" + site.blurb + "</p>" +
-            '<span class="cta">進入 ' + arrowSvg() + "</span>";
-          grid.appendChild(card);
-        });
-
-        sec.appendChild(grid);
-        catsEl.appendChild(sec);
-      });
-
-      function filter() {
-        var term = (q.value || "").trim().toLowerCase();
-        clearBtn.hidden = !term;
-        var total = 0;
-        var shown = 0;
-
-        cats.forEach(function (cat) {
-          var sec = document.getElementById(cat.id);
-          var cards = sec.querySelectorAll(".card");
-          var catShown = 0;
-          cards.forEach(function (card) {
-            total++;
-            var ok = !term || card.dataset.keys.indexOf(term) !== -1;
-            card.hidden = !ok;
-            if (ok) { shown++; catShown++; }
-          });
-          sec.hidden = catShown === 0;
-        });
-
-        // jump chips
-        Array.prototype.forEach.call(jumpEl.children, function (chip) {
-          var id = chip.getAttribute("href").slice(1);
-          var sec = document.getElementById(id);
-          chip.style.display = sec.hidden ? "none" : "";
-        });
-
-        empty.classList.toggle("show", shown === 0);
-        if (!term) {
-          hint.innerHTML = "共 <strong>" + total + "</strong> 個主題，可直接點下面分類，或用關鍵字搜尋。";
-        } else if (shown === 0) {
-          hint.innerHTML = "搜尋「<strong>" + term.replace(/</g, "") + "</strong>」：沒有符合的主題。";
-        } else {
-          hint.innerHTML = "搜尋「<strong>" + term.replace(/</g, "") + "</strong>」：找到 <strong>" + shown + "</strong> 個主題。";
-        }
-      }
-
-      q.addEventListener("input", filter);
-      clearBtn.addEventListener("click", function () {
-        q.value = "";
-        q.focus();
-        filter();
-      });
-      filter();
-    })();
-  </script>
-</body>
-</html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>險種快譯通｜dashin-team</title>
+<style>
+:root{
+  --navy:#0b1f3a;--navy2:#142848;--gold:#c9a227;--gold2:#e8c547;
+  --green:#2d6a4f;--green2:#40916c;--ink:#0b1f3a;--cream:#f7fafc;
+  --muted:#5a6b7d;--white:#ffffff;--soft:#e8eef5;
+}
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;color:var(--ink);background:radial-gradient(#ffffff,#dce6f2)}
+#app{position:fixed;inset:0}#app canvas{display:block}
+.glass{background:rgba(255,255,255,.88);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 1px 2px #0b1f3a10,0 8px 24px #0b1f3a14,0 24px 60px #0b1f3a12;border:1px solid #0b1f3a12}
+.eyebrow{font:700 10px ui-monospace,monospace;letter-spacing:2px;color:var(--gold);text-transform:uppercase}
+button{min-height:44px;border-radius:9px;border:0;background:#fff;color:var(--ink);font:inherit;cursor:pointer;padding:0 12px}
+button:hover{background:var(--gold2)}button[aria-pressed=true]{background:var(--navy);color:#fff}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+#brand{position:fixed;left:16px;top:16px;border-radius:18px;padding:12px 18px;z-index:5}
+#brand h1{margin:2px 0 0;font:800 28px/1 Georgia,"Noto Sans TC",serif;color:var(--navy);letter-spacing:-.5px}
+#brand small{color:var(--muted)}
+#tools{position:fixed;left:16px;top:104px;display:flex;gap:6px;z-index:5}
+#card{position:fixed;left:16px;top:164px;bottom:96px;width:340px;border-radius:22px;padding:18px;overflow:auto;z-index:6;display:none}
+#card.open{display:block}#card h2{margin:6px 0 8px;font-size:22px}
+#card .sec{margin:14px 0}#card .sec h3{margin:0 0 4px;font-size:14px;color:var(--green)}
+#card p,#card li{font-size:14.5px;line-height:1.65;margin:0}
+#closeCard{position:absolute;right:10px;top:10px;min-height:36px;width:36px;padding:0}
+#side{position:fixed;right:16px;top:16px;bottom:96px;width:318px;border-radius:22px;padding:14px;overflow:auto;z-index:5;display:none}
+#side.open{display:block}#side input{width:100%;min-height:44px;border-radius:9px;border:1px solid #d0dbe8;padding:0 12px;font:inherit;margin:8px 0}
+#side details{background:#fff;border-radius:12px;margin:6px 0;padding:8px 10px}
+#side summary{cursor:pointer;font-weight:700;min-height:28px;display:flex;align-items:center;gap:6px}
+#side details p{font-size:13px;margin:6px 0 2px;color:var(--muted)}
+#side .district{margin:12px 0 4px;font:700 11px ui-monospace,monospace;letter-spacing:1px;color:var(--green);text-transform:uppercase}
+#side details[open]{box-shadow:inset 3px 0 0 var(--gold)}
+#side details.coming{opacity:.72}
+#hud{position:fixed;left:50%;bottom:30px;transform:translateX(-50%);border-radius:999px;padding:6px;display:flex;gap:4px;z-index:5;align-items:center}
+#hud button{border-radius:999px;font-size:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;min-width:52px}
+#hud button i{font-style:normal;font-size:16px}#clock{font:italic 700 20px Georgia,serif;padding:0 10px;min-width:74px;text-align:center;color:var(--navy)}
+#timeBtn{display:none}
+.lbl{pointer-events:auto;cursor:pointer;background:#fff;border-radius:999px;padding:4px 10px;font-size:12.5px;font-weight:700;box-shadow:0 2px 8px #0b1f3a14;white-space:nowrap;transition:opacity .2s;border:1px solid #0b1f3a14}
+.lbl em{font:700 10px ui-monospace,monospace;color:var(--gold);font-style:normal;margin-right:4px}
+.lbl.sel{background:var(--navy);color:#fff}.lbl.dim{opacity:.45}
+.lbl.coming{background:#e8eef5;color:#7a8796}.lbl.coming::after{content:" 即將推出";font-size:10px;color:var(--gold);font-weight:700}
+#footer{position:fixed;right:16px;bottom:8px;font-size:12px;color:var(--muted);z-index:4;background:#ffffffcc;padding:2px 10px;border-radius:999px}
+#loading{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(#ffffff,#dce6f2);z-index:20;transition:opacity .5s}
+#loading b{font-size:40px;color:var(--navy)}#loading.hide{opacity:0;pointer-events:none}
+#help{position:fixed;inset:0;background:#0b1f3a66;display:none;align-items:center;justify-content:center;z-index:15}
+#help.open{display:flex}#help .box{max-width:380px;border-radius:22px;padding:22px;margin:16px}
+#help ol{padding-left:20px;line-height:1.8}
+.grip{display:none}
+.itile{display:inline-flex;width:44px;height:44px;border-radius:12px;background:#e8f5ee;align-items:center;justify-content:center;font-size:24px;margin-right:8px;vertical-align:middle}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.chip{border-radius:999px;background:#fff;padding:4px 10px;font-size:12.5px;box-shadow:0 2px 8px #0b1f3a14;border:1px solid #e8eef5}
+.chip.gold{background:var(--gold2);border-color:transparent}.chip.coming{background:#e8eef5;color:#7a8796}
+.cta{display:block;width:100%;margin-top:12px;background:var(--navy);color:#fff;font-weight:700;text-align:center;text-decoration:none;line-height:44px;border-radius:12px}
+.cta:hover{background:var(--green)}.cta.disabled{background:#b8c2cf;pointer-events:none}
+.num{font:italic 18px Georgia,serif;color:var(--gold);min-width:34px}
+@media (max-width:800px){
+ #hud{z-index:8}#card{padding-bottom:130px}
+ #brand{padding:8px 12px;right:72px}#brand h1{font-size:18px}
+ #tools{flex-direction:column;left:auto;right:12px;top:12px}
+ #card,#side{left:0;right:0;bottom:0;top:auto;width:auto;border-radius:22px 22px 0 0;padding-top:4px}
+ #card{height:38%;z-index:7}#side{height:52%}#card.full,#side.full{height:92%}
+ .grip{display:block;width:44px;height:5px;border-radius:9px;background:#b8c2cf;margin:8px auto 10px;cursor:grab;touch-action:none}
+ #hud{bottom:28px;flex-wrap:wrap;justify-content:center;width:calc(100% - 24px);border-radius:18px}
+ #hud .t{display:none}#hud.open .t{display:flex}#timeBtn{display:flex}
+ #footer{left:50%;right:auto;transform:translateX(-50%);bottom:4px}
+}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+</head><body>
+<div id="app"></div>
+<div id="loading"><b>險種快譯通</b><p id="loadMsg">正在組合網站島嶼…</p></div>
+<div id="brand" class="glass"><div class="eyebrow">Dashin Hub</div><h1>險種快譯通</h1><small>點島進入各網站 · 深藍・金・綠</small></div>
+<div id="tools"><button id="bHome" title="全景">⌂ 全景</button><button id="bList" aria-pressed="false">☰ 清單</button><button id="bHelp">?</button></div>
+<aside id="card" class="glass" aria-live="polite"><div class="grip"></div><button id="closeCard" aria-label="關閉">✕</button><div id="cardBody"></div></aside>
+<aside id="side" class="glass"><div class="grip"></div><div class="eyebrow">網站清單</div><input id="q" placeholder="搜尋：癌症、車險、長照、報價…"><div id="list"></div></aside>
+<div id="hud" class="glass">
+ <span id="clock">10:00</span>
+ <button id="timeBtn"><i>◷</i>時間</button>
+ <button class="t" data-t="360"><i>🌅</i>清晨 06</button><button class="t" data-t="720"><i>☀️</i>白天 12</button>
+ <button class="t" data-t="1080"><i>🌇</i>黃昏 18</button><button class="t" data-t="1260"><i>🌙</i>夜晚 21</button>
+ <button id="bPause" aria-pressed="false"><i>⏸</i>暫停</button><button id="bBird" aria-pressed="false"><i>🛰</i>鳥瞰</button>
+</div>
+<div id="help"><div class="box glass"><div class="eyebrow">How to</div><h2>怎麼用險種快譯通</h2>
+<ol><li>拖曳旋轉、滾輪或雙指縮放。</li><li>點一座島，看簡介後按「進入」打開該網站。</li><li>灰色島是「即將推出」，還沒有連結。</li><li>右側清單可依主題瀏覽或搜尋。</li></ol>
+<button id="helpOk" style="background:var(--navy);color:#fff;width:100%">開始逛</button></div></div>
+<div id="footer">dashin-team · 險種快譯通</div>
+<script type="module">
+/* ========== EDITABLE SITE LIST ========== */
+const SITES=[
+ // 醫療／重症
+ {id:'critical-illness',n:'認識重大傷病',icon:'🩺',district:'醫療／重症',url:'https://dashin-team.github.io/critical-illness/',desc:'重大傷病保障觀念與重點整理，快速搞懂一次金與健保重大傷病的差異。',q:0,r:0,model:'hall',tile:'dots',col:'#2d6a4f'},
+ {id:'surgery',n:'實支實付＆手術險',icon:'🏥',district:'醫療／重症',url:'https://dashin-team.github.io/surgery-insurance-guide/',desc:'實支實付與手術險怎麼搭配？住院、門診手術、自費項目一次看懂。',q:1,r:0,model:'clinic',tile:'brick',col:'#40916c'},
+ {id:'medical-coming',n:'醫療／住院日額',icon:'🛏️',district:'醫療／重症',url:null,desc:'住院日額與醫療保障教育頁，即將推出。',q:0,r:1,model:'clinic',tile:'brick',col:'#94a3b8',coming:true},
+ // 癌症
+ {id:'cancer-map',n:'癌症風險地圖',icon:'🗺️',district:'癌症',url:'https://dashin-team.github.io/cancer-risk-map/',desc:'用地圖方式呈現癌症風險與保障重點，適合當開場或講座視覺。',q:2,r:-1,model:'lab',tile:'stripe',col:'#c9a227'},
+ {id:'cancer-quiz',n:'我們與癌的距離 10 題檢測',icon:'📝',district:'癌症',url:'https://dashin-team.github.io/cancer-risk-quiz/',desc:'十題快速檢測，帶客戶聊聊癌症風險與準備。',q:3,r:-1,model:'lab',tile:'dots',col:'#e8c547'},
+ {id:'cia-cib',n:'男癌／女癌試算',icon:'🎗️',district:'癌症',url:'https://dashin-team.github.io/cia-cib-cancer/',desc:'男癌、女癌相關試算與說明，協助客戶對症檢視。',q:2,r:0,model:'garden',tile:'stripe',col:'#c9a227'},
+ // 意外／失能長照
+ {id:'accident',n:'骨折險報價',icon:'🦴',district:'意外／失能長照',url:'https://dashin-team.github.io/accident-insurance/',desc:'骨折險快速報價工具，見客戶時可現場試算。',q:-1,r:1,model:'workshop',tile:'brick',col:'#0b1f3a'},
+ {id:'accident-guide',n:'意外險教育訓練',icon:'🦺',district:'意外／失能長照',url:'https://dashin-team.github.io/accident-insurance-guide/',desc:'意外險觀念與教育訓練講義，適合新人與早會。',q:-2,r:1,model:'busstop',tile:'brick',col:'#142848'},
+ {id:'ltc',n:'失能、長照、失智險比較',icon:'🧓',district:'意外／失能長照',url:'https://dashin-team.github.io/ltc-compare-v2/',desc:'失能、長照、失智三種保障差異比較，釐清常見混淆。',q:-1,r:2,model:'house',tile:'dots',col:'#2d6a4f'},
+ {id:'life-coming',n:'壽險',icon:'🏠',district:'意外／失能長照',url:null,desc:'壽險保障與受益人安排教育頁，即將推出。',q:-2,r:2,model:'hall',tile:'dots',col:'#94a3b8',coming:true},
+ // 車險／旅平／責任
+ {id:'car-quote',n:'汽機車險報價',icon:'🚗',district:'車險／旅平／責任',url:'https://dashin-team.github.io/car-quote/',desc:'汽機車險報價入口，快速幫客戶估強制＋任意險。',q:1,r:2,model:'garage',tile:'brick',col:'#0b1f3a'},
+ {id:'fubon-car',n:'富邦車險健檢教學',icon:'📋',district:'車險／旅平／責任',url:'https://dashin-team.github.io/fubon-car-insurance-guide/',desc:'富邦車險健檢步驟教學，給夥伴照著做。',q:2,r:1,model:'garage',tile:'stripe',col:'#142848'},
+ {id:'car-claim',n:'車禍理賠流程',icon:'🚦',district:'車險／旅平／責任',url:'https://dashin-team.github.io/nanen-car-claim-guide/',desc:'車禍後理賠流程圖解，給客戶安心、給自己標準話術。',q:1,r:1,model:'shop',tile:'brick',col:'#c9a227'},
+ {id:'travel',n:'旅平險大補給',icon:'✈️',district:'車險／旅平／責任',url:'https://dashin-team.github.io/travel-insurance-guide/',desc:'出國前後旅平險重點補給站，含海外突發疾病提醒。',q:0,r:2,model:'airport',tile:'stripe',col:'#40916c'},
+ {id:'teacher',n:'教師責任險',icon:'👩‍🏫',district:'車險／旅平／責任',url:'https://dashin-team.github.io/teacher-liability/',desc:'教師責任險說明頁，面向教職族群。',q:3,r:0,model:'shop',tile:'dots',col:'#2d6a4f'},
+ // 稅務／資產
+ {id:'estate',n:'遺產稅・贈與稅規劃',icon:'📜',district:'稅務／資產',url:'https://dashin-team.github.io/estate-tax-planner/',desc:'遺產稅與贈與稅規劃工具，協助家族資產安排討論。',q:-1,r:-1,model:'bank',tile:'dots',col:'#c9a227'},
+ {id:'retire-coming',n:'退休／儲蓄',icon:'🐷',district:'稅務／資產',url:null,desc:'退休與儲蓄規劃教育頁，即將推出。',q:0,r:-1,model:'bank',tile:'stripe',col:'#94a3b8',coming:true},
+ {id:'invest-coming',n:'投資型',icon:'📈',district:'稅務／資產',url:null,desc:'投資型保險觀念整理，即將推出。',q:-2,r:0,model:'bank',tile:'brick',col:'#94a3b8',coming:true},
+ // 團隊／工具
+ {id:'daily-news',n:'南恩新聞報報',icon:'📰',district:'團隊／工具',url:'https://dashin-team.github.io/daily-news/',desc:'南恩每日新聞報報，早會開場與社群素材。',q:3,r:-2,model:'shop',tile:'stripe',col:'#0b1f3a'},
+ {id:'dashin-office',n:'4汗的辦公室',icon:'🏢',district:'團隊／工具',url:'https://dashin-team.github.io/dashin-office/',desc:'4汗辦公室入口與團隊形象頁。',q:4,r:-2,model:'hall',tile:'brick',col:'#142848'},
+ {id:'rewards',n:'競賽獎勵辦法',icon:'🏆',district:'團隊／工具',url:'https://dashin-team.github.io/fubon-q4-rewards/',desc:'競賽獎勵辦法說明，激勵夥伴衝刺。',q:4,r:-1,model:'garden',tile:'dots',col:'#c9a227'},
+ {id:'human-risk',n:'人類風險地圖',icon:'🧭',district:'團隊／工具',url:'https://dashin-team.github.io/human-risk-map/',desc:'人生各階段風險地圖，講座與需求探索好用。',q:4,r:0,model:'lab',tile:'stripe',col:'#2d6a4f'},
+ {id:'ig',n:'IG 輪播圖生成器',icon:'📱',district:'團隊／工具',url:'https://dashin-team.github.io/ig-carousel/',desc:'一鍵產出 IG 輪播圖，省下設計時間。',q:3,r:1,model:'workshop',tile:'brick',col:'#40916c'},
+ {id:'reading',n:'讀書會講義',icon:'📚',district:'團隊／工具',url:'https://dashin-team.github.io/reading-club-handouts/',desc:'讀書會講義彙整，團隊學習共用。',q:4,r:1,model:'house',tile:'dots',col:'#0b1f3a'},
+ {id:'q4-report',n:'第四季競賽戰報',icon:'📊',district:'團隊／工具',url:'https://dashin-team.github.io/tn826-q4-report/',desc:'第四季競賽戰報儀表板。',q:5,r:-1,model:'hall',tile:'stripe',col:'#c9a227'},
+ {id:'newborn-coming',n:'新生兒投保',icon:'👶',district:'團隊／工具',url:null,desc:'新生兒投保準備與時程說明，即將推出。',q:2,r:-2,model:'house',tile:'dots',col:'#94a3b8',coming:true},
+];
+const DISTRICTS=['醫療／重症','癌症','意外／失能長照','車險／旅平／責任','稅務／資產','團隊／工具'];
+const ROUTES=[
+ ['critical-illness','surgery'],['surgery','cancer-map'],['cancer-map','cancer-quiz'],['cancer-quiz','cia-cib'],
+ ['accident','accident-guide'],['accident','ltc'],['car-quote','car-claim'],['car-claim','fubon-car'],
+ ['travel','teacher'],['estate','critical-illness'],['daily-news','dashin-office'],['human-risk','ig'],
+ ['accident','car-quote'],['ltc','travel'],['cia-cib','teacher'],['rewards','q4-report']
+];
+const DATA={islands:SITES,routes:ROUTES};
+/* ========== THREE.JS SCENE ========== */
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {CSS2DRenderer,CSS2DObject} from 'three/addons/renderers/CSS2DRenderer.js';
+import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
+import * as BGU from 'three/addons/utils/BufferGeometryUtils.js';
+import {SimplexNoise} from 'three/addons/math/SimplexNoise.js';
+const $=s=>document.querySelector(s);
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const rnd=mulberry32(20261028);
+const lsGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}},lsSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+try{
+const R=1.72,SP=2.05,TOP=0.65,WY=-0.18;
+const mobile=matchMedia('(max-width:800px)').matches;
+const rmq=matchMedia('(prefers-reduced-motion: reduce)');let reduced=rmq.matches;
+const app=$('#app');
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,mobile?1.3:1.6));
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1;
+app.appendChild(renderer.domElement);
+const css=new CSS2DRenderer();css.domElement.style.cssText='position:absolute;inset:0;pointer-events:none';app.appendChild(css.domElement);
+const scene=new THREE.Scene();scene.fog=new THREE.Fog(0xe8eef5,48,170);
+const camera=new THREE.PerspectiveCamera(32,1,.3,320);
+const controls=new OrbitControls(camera,renderer.domElement);
+Object.assign(controls,{enableDamping:true,dampingFactor:.07,enablePan:false,minPolarAngle:25*Math.PI/180,maxPolarAngle:70*Math.PI/180,minDistance:3,maxDistance:85});
+const ax=(q,r)=>new THREE.Vector3(Math.sqrt(3)*SP*(q+r/2),0,1.5*SP*r);
+const center=new THREE.Vector3();DATA.islands.forEach(d=>{d.pos=ax(d.q,d.r);center.add(d.pos)});center.divideScalar(DATA.islands.length);
+const skyU={uTop:{value:new THREE.Color()},uHorizon:{value:new THREE.Color()},uSunDir:{value:new THREE.Vector3(0,1,0)},uSun:{value:new THREE.Color()},uNight:{value:0}};
+scene.add(new THREE.Mesh(new THREE.SphereGeometry(170,32,16),new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,fog:false,uniforms:skyU,
+ vertexShader:`varying vec3 vD;void main(){vD=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+ fragmentShader:`uniform vec3 uTop,uHorizon,uSunDir,uSun;uniform float uNight;varying vec3 vD;
+ float h(vec3 p){return fract(sin(dot(p,vec3(12.9898,78.233,37.719)))*43758.5453);}
+ void main(){vec3 d=normalize(vD);vec3 c=mix(uHorizon,uTop,smoothstep(-.02,.55,d.y));c+=uSun*pow(max(dot(d,uSunDir),0.),18.)*.35;
+ float s=h(floor(d*180.));if(s>.9965&&d.y>0.)c+=vec3(uNight);gl_FragColor=vec4(c,1.);}`})));
+const waterU={uTime:{value:0},uShallow:{value:new THREE.Color('#8eb8c8')},uDeep:{value:new THREE.Color('#4a7a94')},uC:{value:center}};
+const waterMat=new THREE.ShaderMaterial({fog:true,uniforms:THREE.UniformsUtils.merge([THREE.UniformsLib.fog,waterU]),
+ vertexShader:`varying vec3 vW;\n#include <fog_pars_vertex>\nvoid main(){vec4 w=modelMatrix*vec4(position,1.);vW=w.xyz;vec4 mvPosition=viewMatrix*w;gl_Position=projectionMatrix*mvPosition;\n#include <fog_vertex>\n}`,
+ fragmentShader:`uniform float uTime;uniform vec3 uShallow,uDeep,uC;varying vec3 vW;\n#include <fog_pars_fragment>\nvoid main(){float d=length(vW.xz-uC.xz);
+ float w=sin(vW.x*.6+uTime*.5)*sin(vW.z*.5-uTime*.4)*.5+sin((vW.x+vW.z)*.9+uTime*.7)*.25;
+ vec3 c=mix(uShallow,uDeep,clamp(d/30.+w*.08,0.,1.));c+=vec3(.06)*smoothstep(.62,.75,w);gl_FragColor=vec4(c,1.);\n#include <fog_fragment>\n}`});
+waterMat.uniforms.uC.value=center;
+const water=new THREE.Mesh(new THREE.CircleGeometry(160,64).rotateX(-Math.PI/2),waterMat);water.position.y=WY;scene.add(water);
+const hemi=new THREE.HemisphereLight(0xeef4fa,0x6a7a70,1.3);scene.add(hemi);
+const sun=new THREE.DirectionalLight(0xfff1de,2.8);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);
+Object.assign(sun.shadow.camera,{left:-28,right:28,top:28,bottom:-28,near:1,far:100});sun.shadow.bias=-.0006;sun.shadow.normalBias=.045;sun.shadow.radius=3;
+sun.target.position.copy(center);scene.add(sun,sun.target);
+const fill=new THREE.DirectionalLight(0xb8d0ff,.4);fill.position.set(-10,8,-6);scene.add(fill);
+const KF=[[0,'0b1f3a','1e3a5f','b4c2ff',1.15,'94a2d8','3a4558',1.85,1,'3a6a88'],[300,'122848','2a4a72','b8c4ff',1.0,'96a4da','3e4860',1.85,1,'3c6c8a'],
+[360,'4a6a98','f0c8a8','ffb48a',1.3,'f3c6b5','4a5568',1.1,.55,'6a98a8'],[450,'7ab0d0','fbe6d3','ffe2c4',2.4,'eaf2f6','6a7a68',1.25,0,'7ab8c0'],
+[720,'6ab0d4','e8eef5','fff1de',2.9,'eef6fa','6a7a70',1.35,0,'7ac0c8'],[960,'70a8c8','f0e8dc','ffe3c0',2.5,'f1efe8','6a7a66',1.25,0,'70b0b8'],
+[1065,'5a6a98','f0b890','ff9f6a',1.8,'f6d2bc','5a6068',1.2,.3,'6888a0'],[1140,'2a3a68','c08090','ff9a7a',1.3,'a098c0','3a4050',1.35,.75,'4a6088'],
+[1260,'0b1f3a','1e3a5f','c0ccff',1.2,'98a8dc','3a4558',1.9,1,'3a6a88']];KF.push([1440,...KF[0].slice(1)]);
+const C=h=>new THREE.Color('#'+h);
+function groundTex(kind,base){const c=document.createElement('canvas');c.width=c.height=256;const g=c.getContext('2d');g.fillStyle=base;g.fillRect(0,0,256,256);
+ const r2=mulberry32(kind.length*99);g.fillStyle='rgba(11,31,58,.06)';
+ if(kind==='brick'){for(let y=0;y<256;y+=16)for(let x=(y/16%2)*16;x<256;x+=32){g.strokeStyle='rgba(11,31,58,.1)';g.strokeRect(x,y,32,16)}}
+ else if(kind==='dots'){for(let i=0;i<220;i++){g.beginPath();g.arc(r2()*256,r2()*256,1+r2()*3,0,7);g.fill()}}
+ else{for(let x=0;x<256;x+=20)g.fillRect(x,0,8,256)}
+ const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.colorSpace=THREE.SRGBColorSpace;return t}
+const texes={brick:groundTex('brick','#f2f6fa'),dots:groundTex('dots','#eaf3ee'),stripe:groundTex('stripe','#f7f3e8')};
+const kit=[];const push=(kind,pos,scl,color,rot=0,glow=false)=>{const m=new THREE.Matrix4();const j=1+(rnd()*2-1)*.0072;
+ m.compose(pos,new THREE.Quaternion().setFromEuler(new THREE.Euler(0,rot,0)),new THREE.Vector3(scl.x*j,scl.y*j,scl.z*j));kit.push({kind:glow?'glow'+kind:kind,m,color,owner:curOwner,small:curSmall})};
+let curOwner=null,curSmall=false;
+const G={box:new THREE.BoxGeometry(1,1,1).translate(0,.5,0),rbox:new RoundedBoxGeometry(1,1,1,2,.12).translate(0,.5,0),cylinder:new THREE.CylinderGeometry(.5,.5,1,14).translate(0,.5,0),
+ cone:new THREE.ConeGeometry(.5,1,14).translate(0,.5,0),sphere:new THREE.SphereGeometry(.5,16,12),ico:new THREE.IcosahedronGeometry(.5,1),
+ hip:new THREE.ConeGeometry(.72,1,4).rotateY(Math.PI/4).translate(0,.5,0),torus:new THREE.TorusGeometry(.4,.1,8,20)};
+G.glowbox=G.box;G.glowsphere=G.sphere;
+const V=(x,y,z)=>new THREE.Vector3(x,y,z);
+function arche(model,o,s,col,rot){const P=(x,y,z)=>{const v=V(x*s,y*s,z*s).applyAxisAngle(V(0,1,0),rot);return v.add(o)};const S=(x,y,z)=>V(x*s,y*s,z*s);
+ const win=(x,y,z)=>push('glowbox',P(x,y,z),S(.14,.14,.04),'#a8c4c2',rot,true);
+ const house=(x,z,w,h,roof)=>{push('rbox',P(x,0,z),S(w,h,w*.8),'#ffffff',rot);push('hip',P(x,h,z),S(w*.85,w*.5,w*.7),roof,rot);win(x-w*.2,h*.45,z+w*.41);win(x+w*.2,h*.45,z+w*.41)};
+ switch(model){
+ case'clinic':house(0,0,.9,.7,'#ffffff');push('box',P(0,.95,.25),S(.3,.1,.06),'#c9a227',rot);push('box',P(0,.85,.25),S(.1,.3,.06),'#c9a227',rot);push('glowsphere',P(.5,.2,.4),S(.12,.12,.12),'#e8c547',rot,true);break;
+ case'hall':push('rbox',P(0,0,0),S(1,.55,.7),'#ffffff',rot);push('box',P(0,.55,0),S(.35,.7,.35),'#f0f4f8',rot);push('hip',P(0,1.25,0),S(.4,.3,.4),col,rot);push('cylinder',P(0,.95,.18),S(.2,.2,.02),'#0b1f3a',rot);for(let i=-2;i<=2;i++)win(i*.18,.3,.36);break;
+ case'lab':push('rbox',P(0,0,0),S(.9,.8,.8),'#ffffff',rot);push('sphere',P(0,.9,0),S(.5,.5,.5),'#2d6a4f',rot);push('torus',P(.35,.5,.42),S(.4,.4,.4),'#c9a227',rot);win(-.2,.4,.41);win(.1,.4,.41);break;
+ case'workshop':push('rbox',P(0,0,0),S(1,.55,.75),'#d0d8e0',rot);push('box',P(-.25,.55,0),S(.15,.5,.15),'#8a7040',rot);push('torus',P(.25,.4,.4),S(.6,.6,.6),'#40916c',rot);win(-.1,.3,.38);break;
+ case'house':house(-.2,0,.6,.5,'#c9a227');house(.35,.2,.45,.4,'#2d6a4f');push('sphere',P(.3,.1,-.35),S(.3,.25,.3),'#6aaa78',rot);break;
+ case'garden':for(let i=0;i<9;i++)push('sphere',P((i%3-1)*.3,.1,(Math.floor(i/3)-1)*.3),S(.22,.2,.22),['#c9a227','#2d6a4f','#40916c','#e8c547'][i%4],rot);push('cylinder',P(0,0,0),S(.12,.8,.12),'#8a7040',rot);push('ico',P(0,.95,0),S(.5,.5,.5),'#c9a227',rot);break;
+ case'busstop':push('box',P(0,0,-.2),S(1.1,.35,.4),'#e8c547',rot);push('box',P(0,.35,-.2),S(1.1,.05,.4),'#0b1f3a',rot);win(-.3,.22,0);win(0,.22,0);win(.3,.22,0);push('box',P(0,0,.35),S(.5,.45,.04),'#2d6a4f',rot);push('box',P(0,.45,.3),S(.6,.05,.25),'#c9a227',rot);break;
+ case'airport':push('rbox',P(0,0,0),S(1,.4,.6),'#ffffff',rot);push('cylinder',P(.35,0,-.1),S(.18,1,.18),'#f0f4f8',rot);push('glowbox',P(.35,1,-.1),S(.28,.2,.28),'#40916c',rot,true);push('box',P(-.2,.5,.3),S(.7,.06,.14),'#0b1f3a',rot);push('cylinder',P(-.2,.45,.3),S(.12,.12,.6),'#ffffff',rot+Math.PI/2);break;
+ case'garage':push('rbox',P(0,0,-.15),S(1,.5,.6),'#d0d8e0',rot);push('rbox',P(0,0,.35),S(.55,.22,.3),'#0b1f3a',rot);push('rbox',P(0,.22,.35),S(.32,.14,.26),'#40916c',rot);for(const x of[-.18,.18])for(const z of[.22,.48])push('cylinder',P(x,0,z),S(.1,.06,.1),'#0b1f3a',rot);break;
+ case'shop':house(0,0,.8,.55,'#2d6a4f');push('box',P(0,.42,.38),S(.85,.06,.2),'#e8c547',rot);push('cylinder',P(.45,0,.4),S(.04,.7,.04),'#0b1f3a',rot);break;
+ case'bank':push('box',P(0,0,0),S(1,.12,.8),'#d0d8e0',rot);for(let i=-2;i<=2;i++)push('cylinder',P(i*.2,.12,.3),S(.08,.55,.08),'#ffffff',rot);push('box',P(0,.12,-.05),S(.85,.55,.5),'#f0f4f8',rot);push('cone',P(0,.67,0),S(1.05,.3,.85),'#c9a227',rot);push('cylinder',P(.45,0,.45),S(.22,.06,.22),'#e8c547',rot);break;
+ }}
+const solidMat=new THREE.MeshStandardMaterial({roughness:.78,metalness:0});
+const glowMat=new THREE.MeshStandardMaterial({roughness:.6,emissive:new THREE.Color('#e8c547'),emissiveIntensity:0});
+const islandGroup=new THREE.Group();scene.add(islandGroup);const pick=[];const labels=[];
+const sideMat=new THREE.MeshStandardMaterial({color:'#d8e0ea',roughness:.9});
+const sideMatComing=new THREE.MeshStandardMaterial({color:'#b8c2cf',roughness:.95});
+DATA.islands.forEach((d,i)=>{const g=new THREE.Group();g.position.copy(d.pos);islandGroup.add(g);d.group=g;
+ const topGeo=new THREE.CircleGeometry(R-.05,6).rotateZ(Math.PI/6).rotateX(-Math.PI/2);
+ const uv=topGeo.attributes.uv,p=topGeo.attributes.position;for(let k=0;k<uv.count;k++)uv.setXY(k,(p.getX(k)+d.pos.x)/2.2,(p.getZ(k)+d.pos.z)/2.2);
+ const topCol=d.coming?'#e8eef5':null;
+ const top=new THREE.Mesh(topGeo,new THREE.MeshStandardMaterial({map:d.coming?null:texes[d.tile],color:d.coming?'#c5ced8':'#ffffff',roughness:.92}));top.position.y=TOP;top.receiveShadow=true;top.userData.island=d;g.add(top);pick.push(top);
+ const body=new THREE.Mesh(new THREE.CylinderGeometry(R,R*1.04,TOP-WY+.1,6).rotateY(Math.PI/6),d.coming?sideMatComing:sideMat);body.position.y=(TOP+WY)/2-.05;body.receiveShadow=body.castShadow=true;body.userData.island=d;g.add(body);pick.push(body);
+ const band=new THREE.Mesh(new THREE.CylinderGeometry(R+.01,R+.01,.16,6,1,true).rotateY(Math.PI/6),new THREE.MeshStandardMaterial({color:d.coming?'#94a3b8':d.col,roughness:.8}));band.position.y=TOP-.08;g.add(band);
+ const path=new THREE.Mesh(new THREE.RingGeometry(1.4,1.62,6).rotateZ(Math.PI/6).rotateX(-Math.PI/2),new THREE.MeshStandardMaterial({color:d.coming?'#b0bac8':'#d4c4a8',roughness:.9,polygonOffset:true,polygonOffsetFactor:-1}));path.position.y=TOP+.002;path.receiveShadow=true;g.add(path);
+ const foam=new THREE.Mesh(new THREE.RingGeometry(R,R+.16,6).rotateZ(Math.PI/6).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:'#fff',transparent:true,opacity:d.coming?.3:.55}));foam.position.y=WY+.01;g.add(foam);
+ const shal=new THREE.Mesh(new THREE.CircleGeometry(R+.7,6).rotateZ(Math.PI/6).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:d.coming?'#a8b8c0':'#a8d4e0',transparent:true,opacity:.45,polygonOffset:true,polygonOffsetFactor:-1}));shal.position.y=WY+.005;g.add(shal);
+ if(!d.coming){
+  curOwner=d;arche(d.model,d.pos.clone().add(V(0,TOP,-.5)),.85,d.col,0);
+  const SUBM=['house','shop','garden','clinic','bank','workshop','busstop','lab'],SLOT=[[-.7,.25],[.7,.25],[0,.52],[-.8,-.38],[.8,-.38]];
+  for(let k=0;k<2;k++){const sl=SLOT[k];arche(SUBM[(i+k)%SUBM.length],d.pos.clone().add(V(sl[0],TOP,sl[1])),.4,d.col,(k-1)*.4)}
+  curSmall=true;
+  for(let k=0;k<6;k++){const a=Math.PI/6+k*Math.PI/3+Math.PI/2,v=d.pos.clone().add(V(Math.cos(a)*1.5,TOP,Math.sin(a)*1.5));
+   push('cylinder',v,V(.04,.45,.04),'#0b1f3a');push('glowsphere',v.clone().add(V(0,.48,0)),V(.09,.09,.09),'#ffffff',0,true);}
+  const treeT=i%4;for(let k=0;k<4;k++){const a=k*1.4+i,rr=1.05+rnd()*.12,v=d.pos.clone().add(V(Math.cos(a)*rr,TOP,Math.sin(a)*rr));
+   push('cylinder',v,V(.06,.28,.06),'#8a7040');
+   if(treeT===0)push('cone',v.clone().add(V(0,.2,0)),V(.35,.5,.35),'#2d6a4f');
+   else if(treeT===1)push('ico',v.clone().add(V(0,.4,0)),V(.38,.35,.38),'#c9a227');
+   else if(treeT===2){push('ico',v.clone().add(V(0,.4,0)),V(.36,.36,.36),'#40916c');push('sphere',v.clone().add(V(.08,.45,.12)),V(.07,.07,.07),'#c9a227')}
+   else push('sphere',v.clone().add(V(0,.35,0)),V(.42,.26,.42),'#6aaa78')}
+  curSmall=false;curOwner=null;
+ }else{
+  curOwner=d;curSmall=true;
+  push('cylinder',d.pos.clone().add(V(0,TOP,0)),V(.08,.55,.08),'#94a3b8');
+  push('sphere',d.pos.clone().add(V(0,TOP+.7,0)),V(.35,.2,.35),'#b8c2cf');
+  push('box',d.pos.clone().add(V(0,TOP+.95,0)),V(.5,.08,.08),'#94a3b8');
+  curSmall=false;curOwner=null;
+ }
+ const el=document.createElement('div');el.className='lbl'+(d.coming?' coming':'');
+ el.innerHTML=`<em>${String(i+1).padStart(2,'0')}</em>${d.icon} ${d.n}`;el.onclick=()=>selectIsland(d);
+ const lb=new CSS2DObject(el);lb.position.set(0,TOP+.25,R*.86);g.add(lb);d.label=el;labels.push(el);
+});
+const nodes=[];const adj=[];const addEdge=(a,b)=>{const w=nodes[a].distanceTo(nodes[b]);adj[a].push([b,w]);adj[b].push([a,w])};
+DATA.islands.forEach(d=>{d.nodes=[];for(let k=0;k<12;k++){const vert=k%2===0,idx=Math.floor(k/2);const a=-Math.PI/2+idx*Math.PI/3+(vert?0:Math.PI/6);const rr=vert?1.5:1.5*Math.cos(Math.PI/6);
+ nodes.push(d.pos.clone().add(V(Math.cos(a)*rr,TOP+.01,Math.sin(a)*rr)));adj.push([]);d.nodes.push(nodes.length-1)}
+ for(let k=0;k<12;k++)addEdge(d.nodes[k],d.nodes[(k+1)%12])});
+const deckMat=new THREE.MeshStandardMaterial({color:'#8a7040',roughness:.85});
+for(let i=0;i<DATA.islands.length;i++)for(let j=i+1;j<DATA.islands.length;j++){const a=DATA.islands[i],b=DATA.islands[j];if(a.pos.distanceTo(b.pos)>Math.sqrt(3)*SP+.15)continue;
+ if(a.coming&&b.coming)continue;
+ const dir=b.pos.clone().sub(a.pos).normalize();let na=a.nodes[0],nb=b.nodes[0],best=1e9,bb=1e9;
+ a.nodes.forEach(n=>{const s=-nodes[n].clone().sub(a.pos).dot(dir);if(s<best){best=s;na=n}});b.nodes.forEach(n=>{const s=nodes[n].clone().sub(b.pos).dot(dir);if(s<bb){bb=s;nb=n}});
+ addEdge(na,nb);const A=nodes[na],B=nodes[nb],len=A.distanceTo(B),rot=Math.atan2(dir.x,dir.z);
+ for(let k=0;k<7;k++){const t=(k+.5)/7,p=A.clone().lerp(B,t);p.y+=Math.sin(t*Math.PI)*.08;const m=new THREE.Mesh(new THREE.BoxGeometry(.32,.05,len/7*.9),deckMat);m.position.copy(p);m.rotation.y=rot;m.castShadow=true;scene.add(m)}}
+function dijkstra(s,t){const dist=nodes.map(()=>1e9),prev=nodes.map(()=>-1),done=new Set();dist[s]=0;
+ while(true){let u=-1,b=1e9;for(let i=0;i<nodes.length;i++)if(!done.has(i)&&dist[i]<b){b=dist[i];u=i}if(u<0||u===t)break;done.add(u);for(const[v,w]of adj[u])if(dist[u]+w<dist[v]){dist[v]=dist[u]+w;prev[v]=u}}
+ const path=[];for(let u=t;u>=0;u=prev[u])path.unshift(nodes[u].clone());return path}
+const byId=Object.fromEntries(DATA.islands.map(d=>[d.id,d]));
+const groups={};kit.forEach(k=>{const key=k.kind+(k.small?'_s':'');(groups[key]=groups[key]||[]).push(k)});
+const smallMeshes=[];const instMeshes=[];
+for(const key in groups){const arr=groups[key],kind=key.replace('_s','');const glow=kind.startsWith('glow');
+ const im=new THREE.InstancedMesh(G[kind],glow?glowMat:solidMat,arr.length);im.castShadow=!glow;im.receiveShadow=true;
+ arr.forEach((k,i)=>{im.setMatrixAt(i,k.m);k.base=new THREE.Color(k.color);im.setColorAt(i,k.base)});im.userData.items=arr;
+ scene.add(im);instMeshes.push(im);if(key.endsWith('_s'))smallMeshes.push(im);else pick.push(im)}
+const simplex=new SimplexNoise({random:mulberry32(7)});
+const tg=new THREE.PlaneGeometry(180,180,mobile?80:120,mobile?80:120).rotateX(-Math.PI/2);const tp=tg.attributes.position;const cols=[];
+const TC=['6a98a0','c8b890','8aaa78','7a9a68','4a6a48','a09880'].map(C);
+for(let i=0;i<tp.count;i++){const x=tp.getX(i)+center.x,z=tp.getZ(i)+center.z,dx=x-center.x,dz=z-center.z,r=Math.hypot(dx,dz);
+ let h=THREE.MathUtils.smoothstep(r,28,55)*9;h+=(simplex.noise(x*.05,z*.05)*.6+simplex.noise(x*.12,z*.12)*.3)*3*THREE.MathUtils.smoothstep(r,25,45);
+ if(dz>0)h*=1-THREE.MathUtils.smoothstep(dz,12,45)*.85;h=Math.round(h*2)/2-1.2;tp.setY(i,h);
+ const c=TC[h<-0.8?0:h<.2?1:h<1.5?2:h<3?3:h<6?4:5];cols.push(c.r,c.g,c.b)}
+tg.setAttribute('color',new THREE.Float32BufferAttribute(cols,3));tg.computeVertexNormals();
+const terrain=new THREE.Mesh(tg,new THREE.MeshStandardMaterial({vertexColors:true,flatShading:true,roughness:1}));terrain.position.set(center.x,0,center.z);terrain.receiveShadow=true;scene.add(terrain);
+const conGeo=BGU.mergeGeometries([0,1,2].map(k=>new THREE.ConeGeometry(.5-k*.12,.7,7).translate(0,.4+k*.35,0)));
+const leafGeo=BGU.mergeGeometries([0,1,2,3].map(k=>new THREE.IcosahedronGeometry(.4,0).translate(Math.sin(k*2)*.25,.6+k*.12,Math.cos(k*2)*.25)));
+const treeMat=new THREE.MeshStandardMaterial({flatShading:true,roughness:1});
+for(const [geo,n] of [[conGeo,mobile?400:900],[leafGeo,mobile?300:700]]){const im=new THREE.InstancedMesh(geo,treeMat,n);const m=new THREE.Matrix4();let c=0;
+ for(let t=0;t<n*4&&c<n;t++){const a=rnd()*Math.PI*2,r=18+rnd()*40,x=center.x+Math.cos(a)*r,z=center.z+Math.sin(a)*r;
+  const lx=x-center.x,lz=z-center.z;const ix=Math.round((lx/180+.5)*(tg.parameters.widthSegments)),iz=Math.round((lz/180+.5)*(tg.parameters.heightSegments));
+  const y=tp.getY(iz*(tg.parameters.widthSegments+1)+ix);if(y<.3)continue;const s=.8+rnd()*1.2;m.compose(V(x,y,z),new THREE.Quaternion(),V(s,s,s));im.setMatrixAt(c,m);
+  im.setColorAt(c,new THREE.Color(['#2d6a4f','#40916c','#6aaa78','#4a7a58'][Math.floor(rnd()*4)]));c++}
+ im.count=c;scene.add(im)}
+const clouds=[];const cloudMat=new THREE.MeshStandardMaterial({color:'#fff',roughness:1,transparent:true,opacity:.92});
+for(let i=0;i<10;i++){const g=new THREE.Group();for(let k=0;k<5;k++){const m=new THREE.Mesh(new THREE.SphereGeometry(1,12,8),cloudMat);m.position.set(k*1.1-2.2,Math.sin(k)*.3,rnd()*.6);m.scale.setScalar(.8+rnd()*.9);g.add(m)}
+ g.position.set(center.x-60+rnd()*120,14+rnd()*8,center.z-50+rnd()*60);g.scale.setScalar(1+rnd());scene.add(g);clouds.push(g)}
+const lh=new THREE.Group();lh.add(new THREE.Mesh(new THREE.CylinderGeometry(.3,.45,2.2,12),new THREE.MeshStandardMaterial({color:'#ffffff'})));
+const lamp=new THREE.Mesh(new THREE.SphereGeometry(.28,12,8),glowMat);lamp.position.y=1.3;lh.add(lamp);lh.position.set(center.x-16,1,center.z+8);scene.add(lh);
+const boat=new THREE.Group();boat.add(new THREE.Mesh(new THREE.BoxGeometry(1,.25,.4),new THREE.MeshStandardMaterial({color:'#8a7040'})));
+const sail=new THREE.Mesh(new THREE.ConeGeometry(.4,1.1,3),new THREE.MeshStandardMaterial({color:'#ffffff'}));sail.position.y=.65;boat.add(sail);boat.position.set(center.x+14,WY+.1,center.z+10);scene.add(boat);
+const isleMat=new THREE.MeshStandardMaterial({color:'#d0d8e0',roughness:.95}),grassMat=new THREE.MeshStandardMaterial({color:'#8aaa78',roughness:.95});
+for(let k=0;k<8;k++){const a=k/8*Math.PI*2+.3,r=18+rnd()*5,x=center.x+Math.cos(a)*r,z=center.z+Math.sin(a)*r*.8,s=.9+rnd()*.9;
+ const b=new THREE.Mesh(new THREE.CylinderGeometry(1.6*s,1.8*s,.5,18),isleMat);b.position.set(x,WY+.1,z);b.receiveShadow=b.castShadow=true;scene.add(b);
+ const gg=new THREE.Mesh(new THREE.CylinderGeometry(1.35*s,1.5*s,.12,18),grassMat);gg.position.set(x,WY+.4,z);gg.receiveShadow=true;scene.add(gg)}
+const boats=[];for(let k=0;k<5;k++){const bt=boat.clone();bt.userData.a=k/5*Math.PI*2;bt.userData.r=13+rnd()*7;scene.add(bt);boats.push(bt)}
+const ACC=['vest','coat','cane','cap','stroller','bike','hat','helmet','suitcase'];
+const skin=['#f3d2b5','#e8bf9c','#d9a982'],shirts=['#0b1f3a','#2d6a4f','#c9a227','#40916c','#142848','#e8c547','#ffffff'];
+const liveRoutes=DATA.routes.filter(rt=>byId[rt[0]]&&byId[rt[1]]&&!byId[rt[0]].coming&&!byId[rt[1]].coming);
+const walkers=[];liveRoutes.forEach((rt)=>{const a=byId[rt[0]],b=byId[rt[1]];const path=dijkstra(a.nodes[6],b.nodes[0]);if(path.length<2)return;
+ const L=[0];for(let i=1;i<path.length;i++)L.push(L[i-1]+path[i].distanceTo(path[i-1]));const n=mobile?2:3+Math.floor(rnd()*2);
+ for(let k=0;k<n;k++){const acc=ACC[Math.floor(rnd()*ACC.length)];walkers.push({path,L,len:L[L.length-1],s:rnd()*L[L.length-1],dir:rnd()<.5?1:-1,wait:0,
+  speed:acc==='bike'?.62+rnd()*.08:.32+rnd()*.08,phase:rnd(),acc,skin:skin[k%3],shirt:shirts[Math.floor(rnd()*7)],hair:rnd()<.5?'#0b1f3a':'#6b4a33',off:(rnd()-.5)*.14,route:rt})}});
+const NW=Math.max(walkers.length,1);
+const mk=(geo,col)=>{const m=new THREE.InstancedMesh(geo,new THREE.MeshStandardMaterial({roughness:.8,color:col||'#fff'}),NW);m.instanceMatrix.setUsage(THREE.DynamicDrawUsage);m.castShadow=true;m.frustumCulled=false;scene.add(m);return m};
+const W={body:mk(new THREE.CapsuleGeometry(.05,.07,4,8)),head:mk(new THREE.SphereGeometry(.075,12,10)),hair:mk(new THREE.SphereGeometry(.079,12,8,0,Math.PI*2,0,Math.PI/2)),
+ legL:mk(new THREE.CapsuleGeometry(.018,.06,3,6).translate(0,-.04,0),'#3b3535'),legR:mk(new THREE.CapsuleGeometry(.018,.06,3,6).translate(0,-.04,0),'#3b3535'),
+ armL:mk(new THREE.CapsuleGeometry(.014,.05,3,6).translate(0,-.035,0)),armR:mk(new THREE.CapsuleGeometry(.014,.05,3,6).translate(0,-.035,0)),
+ acc:mk(new THREE.BoxGeometry(1,1,1)),eye:mk(new THREE.BoxGeometry(.07,.016,.01),'#0b1f3a')};
+const shadowM=new THREE.InstancedMesh(new THREE.CircleGeometry(.07,12).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:'#000',transparent:true,opacity:.22,depthWrite:false}),NW);shadowM.frustumCulled=false;scene.add(shadowM);
+walkers.forEach((w,i)=>{W.body.setColorAt(i,new THREE.Color(w.shirt));W.head.setColorAt(i,new THREE.Color(w.skin));W.hair.setColorAt(i,new THREE.Color(w.acc==='cap'?'#e8c547':w.acc==='helmet'?'#e8c547':w.hair));
+ W.armL.setColorAt(i,new THREE.Color(w.shirt));W.armR.setColorAt(i,new THREE.Color(w.shirt));
+ W.acc.setColorAt(i,new THREE.Color({vest:'#c9a227',coat:'#ffffff',cane:'#8a7040',cap:'#e8c547',stroller:'#2d6a4f',bike:'#40916c',hat:'#e8c547',helmet:'#e8c547',suitcase:'#0b1f3a'}[w.acc]))});
+const dm=new THREE.Object3D();
+function posAt(w,s){let i=1;while(i<w.L.length-1&&w.L[i]<s)i++;const t=(s-w.L[i-1])/Math.max(1e-6,w.L[i]-w.L[i-1]);const p=w.path[i-1].clone().lerp(w.path[i],t);const d=w.path[i].clone().sub(w.path[i-1]).normalize();return[p,d]}
+function setPart(mesh,i,base,yaw,lx,ly,lz,rx=0,sc=1,sv){const v=V(lx,ly,lz).multiplyScalar(sc).applyAxisAngle(V(0,1,0),yaw);dm.position.copy(base).add(v);dm.rotation.set(rx,yaw,0);dm.scale.copy(sv||V(1,1,1)).multiplyScalar(sc);dm.updateMatrix();mesh.setMatrixAt(i,dm.matrix)}
+function updateWalkers(dt,time){if(!walkers.length)return;const sc=THREE.MathUtils.clamp(camera.position.distanceTo(controls.target)/22,1,1.45);
+ walkers.forEach((w,i)=>{if(w.wait>0)w.wait-=dt;else{w.s+=w.dir*w.speed*dt;if(w.s>w.len||w.s<0){w.s=THREE.MathUtils.clamp(w.s,0,w.len);w.dir*=-1;w.wait=1.4}}
+  const[p,d]=posAt(w,w.s);const yaw=Math.atan2(d.x*w.dir,d.z*w.dir);p.add(V(d.z,0,-d.x).multiplyScalar(w.off));const ph=time*9+w.phase*20,moving=w.wait<=0;
+  const sw=moving?Math.sin(ph):0;const bob=moving?Math.abs(Math.sin(ph))*.012:0;const b=p.clone();b.y+=bob;
+  setPart(W.legL,i,b,yaw,-.025,.09,0,sw*.55,sc);setPart(W.legR,i,b,yaw,.025,.09,0,-sw*.55,sc);
+  setPart(W.body,i,b,yaw,0,.15,0,0,sc);setPart(W.armL,i,b,yaw,-.062,.19,0,-sw*.45,sc);setPart(W.armR,i,b,yaw,.062,.19,0,sw*.45,sc);
+  setPart(W.head,i,b,yaw,0,.28,0,0,sc);setPart(W.hair,i,b,yaw,0,.285,-.005,0,sc);setPart(W.eye,i,b,yaw,0,.285,.07,0,sc);
+  const A={vest:[0,.15,.03,V(.1,.08,.06)],coat:[0,.13,0,V(.11,.12,.1)],cane:[.09,.06,.03,V(.012,.14,.012)],cap:[0,.35,.02,V(.12,.02,.13)],stroller:[0,.07,.15,V(.1,.09,.12)],
+   bike:[0,.04,0,V(.03,.07,.26)],hat:[0,.34,0,V(.2,.02,.2)],helmet:[0,.34,0,V(.13,.03,.13)],suitcase:[.08,.04,-.02,V(.07,.09,.04)]}[w.acc];
+  setPart(W.acc,i,b,yaw,A[0],A[1],A[2],0,sc,A[3]);dm.position.copy(p);dm.position.y+=.003;dm.rotation.set(0,0,0);dm.scale.setScalar(sc);dm.updateMatrix();shadowM.setMatrixAt(i,dm.matrix)});
+ for(const k in W){W[k].instanceMatrix.needsUpdate=true;if(W[k].instanceColor)W[k].instanceColor.needsUpdate=true}shadowM.instanceMatrix.needsUpdate=true}
+const tubes=[];liveRoutes.forEach(rt=>{const a=byId[rt[0]],b=byId[rt[1]];const path=dijkstra(a.nodes[6],b.nodes[0]).map(p=>p.add(V(0,.05,0)));
+ if(path.length<2)return;
+ const curve=new THREE.CatmullRomCurve3(path,false,'catmullrom',0);const len=curve.getLength();
+ const m=new THREE.Mesh(new THREE.TubeGeometry(curve,Math.max(20,path.length*8),.03,6),new THREE.ShaderMaterial({transparent:true,uniforms:{uT:{value:0},uL:{value:len}},
+  vertexShader:`varying vec2 vU;void main(){vU=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+  fragmentShader:`uniform float uT,uL;varying vec2 vU;void main(){float u=vU.x*uL*5.-uT*1.4;if(fract(u)>.6)discard;gl_FragColor=vec4(.78,.64,.15,.85);}`}));
+ m.visible=false;m.userData.rt=rt;scene.add(m);tubes.push(m)});
+let minutes=600,paused=false;
+function applyTime(min){min=Math.round(min/10)*10%1440;let i=0;while(KF[i+1][0]<min)i++;const a=KF[i],b=KF[i+1],t=(min-a[0])/(b[0]-a[0]||1);
+ const lc=(ai)=>C(a[ai]).lerp(C(b[ai]),t),ln=(ai)=>a[ai]+(b[ai]-a[ai])*t;
+ skyU.uTop.value.copy(lc(1));skyU.uHorizon.value.copy(lc(2));scene.fog.color.copy(skyU.uHorizon.value);sun.color.copy(lc(3));sun.intensity=ln(4);skyU.uSun.value.copy(sun.color);
+ hemi.color.copy(lc(5));hemi.groundColor.copy(lc(6));hemi.intensity=ln(7);const night=ln(8);skyU.uNight.value=night;
+ waterMat.uniforms.uShallow.value.copy(lc(9)).lerp(C('ffffff'),.12);waterMat.uniforms.uDeep.value.copy(lc(9)).multiplyScalar(.8);
+ glowMat.emissiveIntensity=night*3.2;
+ const tt=THREE.MathUtils.clamp((min-360)/720,0,1),az=Math.PI*(.15+.7*tt),el=.35+Math.sin(tt*Math.PI)*.75;
+ const dir=V(Math.cos(az)*Math.cos(el),Math.sin(el),.55*Math.cos(el)+.35).normalize();sun.position.copy(center).addScaledVector(dir,40);skyU.uSunDir.value.copy(dir);
+ const h=Math.floor(min/60),mm=min%60;$('#clock').textContent=`${String(h).padStart(2,'0')}:${String(mm).padStart(2,'0')}`;
+ document.querySelectorAll('#hud .t').forEach(bn=>bn.setAttribute('aria-pressed',Math.abs(+bn.dataset.t-min)<1?'true':'false'))}
+const HOME_DIR=V(.28,.55,.78).normalize();
+function homeDist(){const a=innerWidth/innerHeight;return a>1.3?34:a>.8?46:62}
+let fly=null,bird=false;
+function flyTo(target,pos){if(reduced){controls.target.copy(target);camera.position.copy(pos);return}fly={t0:performance.now(),p0:camera.position.clone(),t0v:controls.target.clone(),p1:pos,t1:target}}
+function goHome(){bird=false;$('#bBird').setAttribute('aria-pressed','false');flyTo(center.clone(),center.clone().addScaledVector(HOME_DIR,homeDist()))}
+const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+let selected=null;
+function highlight(){instMeshes.forEach(im=>{im.userData.items.forEach((k,i)=>{const c=k.base.clone();if(selected&&k.owner===selected)c.lerp(C('c9a227'),.28);im.setColorAt(i,c)});im.instanceColor.needsUpdate=true})}
+function selectIsland(d){selected=d;labels.forEach(l=>l.classList.remove('sel','dim'));d.label.classList.add('sel');labels.forEach(l=>{if(l!==d.label)l.classList.add('dim')});
+ highlight();tubes.forEach(t=>t.visible=t.userData.rt.includes(d.id));
+ const i=DATA.islands.indexOf(d);
+ const chips=`<div class="chips"><span class="chip">${d.district}</span>${d.coming?'<span class="chip coming">即將推出</span>':'<span class="chip gold">可進入</span>'}</div>`;
+ const cta=d.coming
+  ?`<a class="cta disabled" href="#">即將推出</a>`
+  :`<a class="cta" href="${d.url}" target="_blank" rel="noopener">進入「${d.n}」→</a>`;
+ $('#cardBody').innerHTML=`<div class="eyebrow">ISLAND ${String(i+1).padStart(2,'0')}</div><h2><span class="itile">${d.icon}</span>${d.n}</h2>${chips}
+ <div class="sec"><h3>簡介</h3><p>${d.desc}</p></div>${cta}
+ ${d.coming?'<p style="font-size:12px;color:var(--muted);margin-top:8px">這座島還沒有網站，之後補上會自動解鎖。</p>':'<p style="font-size:12px;color:var(--muted);margin-top:8px">會在新分頁開啟 dashin-team 網站。</p>'}`;
+ $('#card').classList.add('open');$('#card').classList.remove('full');
+ const off=V(3.2,6.2,7.4);const tgt=d.pos.clone().add(V(0,TOP,0));
+ flyTo(tgt.clone(),tgt.clone().add(off));if(innerWidth<=800)$('#side').classList.remove('open');dirty=true}
+function closeCard(){selected=null;$('#card').classList.remove('open');labels.forEach(l=>l.classList.remove('sel','dim'));highlight();tubes.forEach(t=>t.visible=false);dirty=true}
+function renderList(f=''){$('#list').innerHTML='';
+ DISTRICTS.forEach(dist=>{
+  const items=DATA.islands.filter(d=>d.district===dist&&(!f||(d.n+d.desc+d.district+(d.url||'')).includes(f)));
+  if(!items.length)return;
+  const h=document.createElement('div');h.className='district';h.textContent=dist;$('#list').appendChild(h);
+  items.forEach(d=>{const i=DATA.islands.indexOf(d);const el=document.createElement('details');if(d.coming)el.className='coming';
+   el.innerHTML=`<summary><span class="num">${String(i+1).padStart(2,'0')}</span>${d.icon} ${d.n}${d.coming?' · 即將推出':''}</summary><p>${d.desc}</p><button style="min-height:36px;margin-top:6px">${d.coming?'查看說明':'在島上看 →'}</button>`;
+   el.querySelector('button').onclick=()=>selectIsland(d);$('#list').appendChild(el)})})}
+renderList();$('#q').oninput=e=>renderList(e.target.value.trim());
+const ray=new THREE.Raycaster(),ndc=new THREE.Vector2();let down=null;
+renderer.domElement.addEventListener('pointerdown',e=>{down=[e.clientX,e.clientY];fly=null});
+renderer.domElement.addEventListener('pointerup',e=>{if(!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>6)return;const r=renderer.domElement.getBoundingClientRect();
+ ndc.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(ndc,camera);const hit=ray.intersectObjects(pick,false)[0];if(!hit)return;
+ let d=hit.object.userData.island;if(!d&&hit.instanceId!=null)d=hit.object.userData.items[hit.instanceId].owner;if(d)selectIsland(d)});
+$('#closeCard').onclick=closeCard;$('#bHome').onclick=()=>{closeCard();goHome()};
+$('#bList').onclick=()=>{const o=$('#side').classList.toggle('open');$('#bList').setAttribute('aria-pressed',o)};
+document.querySelectorAll('#hud .t').forEach(b=>b.onclick=()=>{minutes=+b.dataset.t;applyTime(minutes);dirty=true});
+$('#timeBtn').onclick=()=>$('#hud').classList.toggle('open');
+$('#bPause').onclick=()=>{paused=!paused;$('#bPause').setAttribute('aria-pressed',paused)};
+$('#bBird').onclick=()=>{bird=!bird;$('#bBird').setAttribute('aria-pressed',bird);if(bird){const t=controls.target.clone();flyTo(t,t.clone().add(V(.01,52,8)))}else goHome()};
+$('#bHelp').onclick=()=>$('#help').classList.add('open');$('#helpOk').onclick=()=>{$('#help').classList.remove('open');lsSet('hub_help','1')};
+addEventListener('keydown',e=>{if(e.key==='Escape'){closeCard();$('#help').classList.remove('open')}
+ if(e.target.tagName==='INPUT')return;const off=camera.position.clone().sub(controls.target);
+ if(e.key==='ArrowLeft'||e.key==='ArrowRight'){off.applyAxisAngle(V(0,1,0),e.key==='ArrowLeft'?.08:-.08);camera.position.copy(controls.target).add(off)}
+ if(e.key==='ArrowUp'||e.key==='ArrowDown'){camera.position.copy(controls.target).add(off.multiplyScalar(e.key==='ArrowUp'?.92:1.08))}});
+document.querySelectorAll('.grip').forEach(gr=>{let y0=null;const sh=gr.parentElement;gr.addEventListener('pointerdown',e=>{y0=e.clientY;gr.setPointerCapture(e.pointerId)});
+ gr.addEventListener('pointerup',e=>{if(y0==null)return;const dy=e.clientY-y0;y0=null;if(dy<-30)sh.classList.add('full');else if(dy>30){if(sh.classList.contains('full'))sh.classList.remove('full');else if(sh.id==='card')closeCard();else{sh.classList.remove('open');$('#bList').setAttribute('aria-pressed','false')}}else sh.classList.toggle('full')})});
+rmq.addEventListener('change',e=>{reduced=e.matches;dirty=true});
+let dirty=true;function resize(){const w=app.clientWidth,h=app.clientHeight;renderer.setSize(w,h);css.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();dirty=true}
+new ResizeObserver(resize).observe(app);resize();
+controls.addEventListener('change',()=>dirty=true);
+camera.position.copy(center).addScaledVector(HOME_DIR,homeDist());controls.target.copy(center);applyTime(minutes);
+const clock=new THREE.Clock();let time=0;
+function loop(){requestAnimationFrame(loop);const dt=Math.min(clock.getDelta(),.08);const anim=!reduced;
+ if(fly){const t=Math.min(1,(performance.now()-fly.t0)/800),e=ease(t);camera.position.lerpVectors(fly.p0,fly.p1,e);controls.target.lerpVectors(fly.t0v,fly.t1,e);if(t>=1)fly=null;dirty=true}
+ controls.update();
+ if(anim){time+=dt;if(!paused){minutes=(minutes+dt*10)%1440;applyTime(minutes)}updateWalkers(paused?0:dt,paused?0:time);waterMat.uniforms.uTime.value=time;
+  tubes.forEach(t=>t.material.uniforms.uT.value=time);clouds.forEach(c=>{c.position.x+=dt*.4;if(c.position.x>center.x+70)c.position.x=center.x-70});boat.position.x=center.x+14+Math.sin(time*.1)*4;boats.forEach(b=>{const a=b.userData.a+time*.02;b.position.set(center.x+Math.cos(a)*b.userData.r,WY+.1+Math.sin(time+a*5)*.03,center.z+Math.sin(a)*b.userData.r*.8);b.rotation.y=-a});dirty=true}
+ else if(dirty)updateWalkers(0,0);
+ const dist=camera.position.distanceTo(controls.target);smallMeshes.forEach(m=>m.visible=dist<28);
+ if(!dirty)return;dirty=false;renderer.render(scene,camera);css.render(scene,camera)}
+loop();
+$('#loading').classList.add('hide');if(!lsGet('hub_help'))$('#help').classList.add('open');
+window.__ok=true;window.__sites=SITES.length;window.__coming=SITES.filter(s=>s.coming).length;
+}catch(err){console.error(err);$('#loadMsg').textContent='載入失敗：'+(err.message||err)+'（請確認瀏覽器支援 WebGL 並可連線 CDN）';window.__ok=false;window.__err=String(err)}
+</script>
+</body></html>
